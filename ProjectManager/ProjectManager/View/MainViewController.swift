@@ -6,11 +6,6 @@
 
 import UIKit
 
-protocol MainViewDelegate: AnyObject {
-    func deleteWork(work: Work)
-    func presentModal(_ viewController: UIViewController, animated: Bool)
-}
-
 final class MainViewController: UIViewController {
     private let viewModel = MainViewModel()
     
@@ -55,9 +50,7 @@ final class MainViewController: UIViewController {
     
     private func configureListView() {
         [todoListView, doingListView, doneListView].forEach {
-            $0.cellDelgate = self
-            $0.workFormDelegate = self
-            $0.mainViewDelegate = self
+            $0.delegate = self
         }
     }
     
@@ -97,7 +90,7 @@ final class MainViewController: UIViewController {
     }
 }
 
-extension MainViewController: WorkFormDelegate, CellDelegate, MainViewDelegate {
+extension MainViewController: WorkFormDelegate, CellDelegate, ListViewDelegate {
     func deleteWork(work: Work) {
         viewModel.deleteWork(data: work)
     }

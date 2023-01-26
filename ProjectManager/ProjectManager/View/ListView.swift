@@ -7,12 +7,15 @@
 
 import UIKit
 
+protocol ListViewDelegate: AnyObject, CellDelegate, WorkFormDelegate {
+    func deleteWork(work: Work)
+    func presentModal(_ viewController: UIViewController, animated: Bool)
+}
+
 final class ListView: UIView {
     let viewModel: ListViewModel
     
-    weak var mainViewDelegate: MainViewDelegate?
-    weak var cellDelgate: CellDelegate?
-    weak var workFormDelegate: WorkFormDelegate?
+    weak var delegate: ListViewDelegate?
     
     private let stackView: UIStackView = {
         let stackView = UIStackView()
@@ -88,7 +91,7 @@ final class ListView: UIView {
     }
     
     private func configureData() {
-        categoryLabel.text = viewModel.category.description
+        categoryLabel.text = "\(viewModel.category)"
         viewModel.load()
     }
     
@@ -136,7 +139,7 @@ extension ListView: UITableViewDelegate, UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: ListCell.identifier, for: indexPath)
                 as? ListCell else { return ListCell() }
 
-        cell.delegate = cellDelgate
+        cell.delegate = delegate
         cell.configureData(viewModel: ListCellViewModel(work: viewModel.workList[indexPath.row]))
     
         return cell
@@ -144,7 +147,7 @@ extension ListView: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle,
                    forRowAt indexPath: IndexPath) {
-        mainViewDelegate?.deleteWork(work: viewModel.workList[indexPath.row])
+        delegate?.deleteWork(work: viewModel.workList[indexPath.row])
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -153,9 +156,9 @@ extension ListView: UITableViewDelegate, UITableViewDataSource {
         
         workFormViewController.viewModel = WorkFormViewModel(work: viewModel.workList[indexPath.row])
                 
-        workFormViewController.delegate = workFormDelegate
+        workFormViewController.delegate = delegate
         navigationViewController.modalPresentationStyle = UIModalPresentationStyle.formSheet
         
-        mainViewDelegate?.presentModal(navigationViewController, animated: true)
+        delegate?.presentModal(navigationViewController, animated: true)
     }
 }
