@@ -7,8 +7,7 @@
 3. [구현 내용](#-구현-내용)
 4. [타임라인](#-타임라인)
 5. [실행 화면](#-실행-화면)
-6. [트러블 슈팅 & 어려웠던 점](#-트러블-슈팅--고민했던-점)
-7. [참고 링크](#-참고-링크)
+6. [트러블 슈팅 & 웠던 점](#-트러블-슈팅--고민했던-점)
 
 ## 😁 소개
 ### 프로젝트 소개
@@ -151,7 +150,7 @@
 ### 기술 스택에 대한 고민
 이번 프로젝트에서는 `MVC`패턴이 아닌 `MVVM`패턴을 적용하여 구현하는 것을 목표로 진행하며 러닝커브를 조금이나마 줄이기 위해 기존에 사용해왔던 `UIKit`, `CoreData`를 채택하였습니다.
 
-## UITableView Delegate, Datasource
+### UITableView Delegate, Datasource
 `MainListViewController`에서 테이블뷰에 대한 딜리게이트와, 데이터소스를 모두 구현하고 셀클릭에 대한 로직을 구현하다 보니 `MainListViewController`에서 테이블 뷰 분기처리하는 부분이 옳지 않다고 판단 되어 `ListView`로 옮겨 진행하였습니다.
 
 **`MainListViewController`에서의 분기처리 했을 시 코드 예시**
@@ -275,7 +274,5 @@ extension ListView: UITableViewDelegate, UITableViewDataSource {
 ```
 
 
-## 📖 참고 링크
----
 
 [🔝 맨 위로 이동하기](#일기장-)
