@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import RxSwift
 
 protocol CellDelegate: AnyObject {
     func showPopover(soruceView: UIView?, work: Work?)
@@ -13,6 +14,7 @@ protocol CellDelegate: AnyObject {
 
 final class ListCell: UITableViewCell {
     private var viewModel: ListCellViewModel?
+    private let disposeBag: DisposeBag = .init()
     
     weak var delegate: CellDelegate?
     
@@ -62,21 +64,24 @@ final class ListCell: UITableViewCell {
     }
     
     private func configureBind() {
-        viewModel?.bindTextValue { [weak self] work in
-            self?.titleLabel.text = work.title
-            self?.bodyLabel.text = work.body
-            self?.dateLabel.text = work.endDateToString
-        }
+        viewModel?.work
+            .subscribe(onNext: { [weak self] work in
+                self?.titleLabel.text = work.title
+                self?.bodyLabel.text = work.body
+                self?.dateLabel.text = work.endDateToString
+            })
+            .disposed(by: disposeBag)
+        viewModel?.dateColor
+            .subscribe(onNext: { [weak self] color in
+                self?.dateLabel.textColor = color
+            })
+            .disposed(by: disposeBag)
         
-        viewModel?.bindTextColor { [weak self] in
-            self?.dateLabel.textColor = $0
-        }
     }
     
     func configureData(viewModel: ListCellViewModel) {
         self.viewModel = viewModel
         configureBind()
-        viewModel.load()
     }
     
     private func configureLayout() {
