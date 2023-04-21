@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import RxCocoa
+import RxSwift
 
 protocol ListViewDelegate: AnyObject, CellDelegate, WorkFormDelegate {
     func deleteWork(work: Work)
@@ -14,7 +16,7 @@ protocol ListViewDelegate: AnyObject, CellDelegate, WorkFormDelegate {
 
 final class ListView: UIView {
     let viewModel: ListViewModel
-    
+    let disposeBag: DisposeBag = .init()
     weak var delegate: ListViewDelegate?
     
     private let stackView: UIStackView = {
@@ -87,12 +89,11 @@ final class ListView: UIView {
     }
     
     func didChangeWorkList(works: [Work]) {
-        viewModel.workList = works
+        viewModel.workList.accept(works)
     }
     
     private func configureData() {
         categoryLabel.text = "\(viewModel.category)"
-        viewModel.load()
     }
     
     private func configureTableView() {
@@ -101,13 +102,15 @@ final class ListView: UIView {
     }
     
     private func configureBind() {
-        viewModel.bindCount { [weak self] in
-            self?.categoryCountLabel.text = $0.description
-        }
+        viewModel.categoryCount
+            .subscribe { [weak self] count in
+                self?.categoryCountLabel.text = count.element?.description
+            }.disposed(by: disposeBag)
         
-        viewModel.bindWorkList { [weak self] _ in
-            self?.tableView.reloadData()
-        }
+        viewModel.workList
+            .subscribe { [weak self] _ in
+                self?.tableView.reloadData()
+            }.disposed(by: disposeBag)
     }
     
     private func configureLayout() {
@@ -132,30 +135,32 @@ final class ListView: UIView {
 
 extension ListView: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.workList.count
+        return viewModel.workList.value.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: ListCell.identifier, for: indexPath)
                 as? ListCell else { return ListCell() }
-
+        
         cell.delegate = delegate
-        cell.configureData(viewModel: ListCellViewModel(work: viewModel.workList[indexPath.row]))
-    
+        
+        cell.configureData(viewModel: ListCellViewModel(work: viewModel.workList.value[indexPath.row]))
+        
         return cell
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle,
                    forRowAt indexPath: IndexPath) {
-        delegate?.deleteWork(work: viewModel.workList[indexPath.row])
+        delegate?.deleteWork(work: viewModel.workList.value[indexPath.row])
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let workFormViewController = WorkFormViewController()
         let navigationViewController = UINavigationController(rootViewController: workFormViewController)
         
-        workFormViewController.viewModel = WorkFormViewModel(work: viewModel.workList[indexPath.row])
-                
+        workFormViewController.viewModel =
+        WorkFormViewModel(work:viewModel.workList.value[indexPath.row])
+        
         workFormViewController.delegate = delegate
         navigationViewController.modalPresentationStyle = UIModalPresentationStyle.formSheet
         

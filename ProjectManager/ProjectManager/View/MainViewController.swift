@@ -5,13 +5,16 @@
 // 
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 final class MainViewController: UIViewController {
-    private let viewModel = MainViewModel()
+    private let viewModel: MainViewModelRx = .init()
+    private let disposeBag: DisposeBag = .init()
     
-    private let todoListView = ListView(viewModel: ListViewModel(category: .todo))
-    private let doingListView = ListView(viewModel: ListViewModel(category: .doing))
-    private let doneListView = ListView(viewModel: ListViewModel(category: .done))
+    private let todoListView: ListView = .init(viewModel: ListViewModel(category: .todo))
+    private let doingListView: ListView = .init(viewModel: ListViewModel(category: .doing))
+    private let doneListView: ListView = .init(viewModel: ListViewModel(category: .done))
     
     private let stackView: UIStackView = {
         let stackView = UIStackView()
@@ -30,7 +33,6 @@ final class MainViewController: UIViewController {
         configureLayout()
         configureListView()
         configureBind()
-        configureData()
     }
     
     private func configureLayout() {
@@ -55,27 +57,26 @@ final class MainViewController: UIViewController {
     }
     
     private func configureBind() {
-        viewModel.bindTodoList { [weak self] in
-            self?.todoListView.didChangeWorkList(works: $0)
+        viewModel.todoList.subscribe { [weak self] works in
+            self?.todoListView.viewModel.workList.accept(works)
         }
+        .disposed(by: disposeBag)
         
-        viewModel.bindDoingList { [weak self] in
-            self?.doingListView.didChangeWorkList(works: $0)
+        viewModel.doingList.subscribe { [weak self] works in
+            self?.doingListView.viewModel.workList.accept(works)
         }
+        .disposed(by: disposeBag)
         
-        viewModel.bindDoneList { [weak self] in
-            self?.doneListView.didChangeWorkList(works: $0)
+        viewModel.doneList.subscribe { [weak self] works in
+            self?.doneListView.viewModel.workList.accept(works)
         }
+        .disposed(by: disposeBag)
     }
     
     private func configureNavigationBar() {
         navigationItem.title = "Project Manager"
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add,
                                                             target: self, action: #selector(addTapped))
-    }
-    
-    private func configureData() {
-        viewModel.load()
     }
     
     @objc private func addTapped() {

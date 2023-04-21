@@ -6,6 +6,74 @@
 //
 
 import Foundation
+import RxSwift
+import RxCocoa
+
+class MainViewModelRx {
+    let todoList: BehaviorRelay<[Work]> = .init(value: [])
+    let doingList: BehaviorRelay<[Work]> = .init(value: [])
+    let doneList: BehaviorRelay<[Work]> = .init(value: [])
+    
+    func categoryToOthers(category: Category) -> [(category: Category, title: String)] {
+        let todoTitle = "Move To Todo"
+        let doingTitle = "Move To Doing"
+        let doneTitle = "Move To Done"
+
+        let categoriesAndTitles = [.todo, .doing, .done].filter { $0 != category }.compactMap { category in
+            switch category {
+            case .todo:
+                return (category: category, title: todoTitle)
+            case .doing:
+                return (category: category, title: doingTitle)
+            case .done:
+                return (category: category, title: doneTitle)
+            }
+        }
+        
+        return categoriesAndTitles
+    }
+    
+    func updateWork(data: Work) {
+        switch data.category {
+        case .todo:
+            todoList.accept(updateList(list: todoList.value, data: data))
+        case .doing:
+            doingList.accept(updateList(list: doingList.value, data: data))
+        case .done:
+            doneList.accept(updateList(list: doneList.value, data: data))
+        }
+    }
+    
+    func updateList(list: [Work], data: Work) -> [Work] {
+        let prevData = list.filter { $0.id == data.id }
+        var newList = list
+        
+        if !prevData.isEmpty,
+           let index = newList.firstIndex(of: prevData[0]) {
+            newList[index] = data
+        } else {
+            newList.append(data)
+        }
+        
+        return newList
+    }
+    
+    func moveWork(data: Work, category: Category) {
+        deleteWork(data: data)
+        updateWork(data: Work(category: category, title: data.title, body: data.body, endDate: data.endDate))
+    }
+    
+    func deleteWork(data: Work) {
+        switch data.category {
+        case .todo:
+            todoList.accept(todoList.value.filter { $0 != data })
+        case .doing:
+            doingList.accept(doingList.value.filter { $0 != data })
+        case .done:
+            doneList.accept(doneList.value.filter { $0 != data })
+        }
+    }
+}
 
 final class MainViewModel {
     var todoList: [Work] = [] {
