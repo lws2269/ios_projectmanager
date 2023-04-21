@@ -57,20 +57,16 @@ final class MainViewController: UIViewController {
     }
     
     private func configureBind() {
-        viewModel.todoList.subscribe { [weak self] works in
-            self?.todoListView.viewModel.workList.accept(works)
-        }
-        .disposed(by: disposeBag)
+        viewModel.todoList
+            .bind(to: todoListView.viewModel.workList)
+            .disposed(by: disposeBag)
+        viewModel.doingList
+            .bind(to: doingListView.viewModel.workList)
+            .disposed(by: disposeBag)
+        viewModel.doneList
+            .bind(to: doneListView.viewModel.workList)
+            .disposed(by: disposeBag)
         
-        viewModel.doingList.subscribe { [weak self] works in
-            self?.doingListView.viewModel.workList.accept(works)
-        }
-        .disposed(by: disposeBag)
-        
-        viewModel.doneList.subscribe { [weak self] works in
-            self?.doneListView.viewModel.workList.accept(works)
-        }
-        .disposed(by: disposeBag)
     }
     
     private func configureNavigationBar() {
