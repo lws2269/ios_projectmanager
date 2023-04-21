@@ -18,6 +18,7 @@
 		546A2A9E297034A50033D593 /* MainViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546A2A9D297034A50033D593 /* MainViewModel.swift */; };
 		5497340C29716A96004F58D0 /* WorkFormController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5497340B29716A96004F58D0 /* WorkFormController.swift */; };
 		54CFDABC2976DB9F00F8DEEC /* ListCellViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54CFDABB2976DB9F00F8DEEC /* ListCellViewModel.swift */; };
+		54DF81EC29F16333004E002D /* Identifiable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54DF81EB29F16333004E002D /* Identifiable.swift */; };
 		8458078EE3871E74082E19E0 /* Pods_ProjectManager.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73B83A86A551901906DABDB7 /* Pods_ProjectManager.framework */; };
 		C7431F0625F51E1D0094C4CF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7431F0525F51E1D0094C4CF /* AppDelegate.swift */; };
 		C7431F0825F51E1D0094C4CF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7431F0725F51E1D0094C4CF /* SceneDelegate.swift */; };
@@ -40,6 +41,7 @@
 		546A2A9D297034A50033D593 /* MainViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewModel.swift; sourceTree = "<group>"; };
 		5497340B29716A96004F58D0 /* WorkFormController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkFormController.swift; sourceTree = "<group>"; };
 		54CFDABB2976DB9F00F8DEEC /* ListCellViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCellViewModel.swift; sourceTree = "<group>"; };
+		54DF81EB29F16333004E002D /* Identifiable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identifiable.swift; sourceTree = "<group>"; };
 		73B83A86A551901906DABDB7 /* Pods_ProjectManager.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ProjectManager.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7431F0225F51E1D0094C4CF /* ProjectManager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ProjectManager.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7431F0525F51E1D0094C4CF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -121,6 +123,14 @@
 			path = ViewModel;
 			sourceTree = "<group>";
 		};
+		54DF81EA29F16324004E002D /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				54DF81EB29F16333004E002D /* Identifiable.swift */,
+			);
+			path = Common;
+			sourceTree = "<group>";
+		};
 		682EB55EB6EC29A34B02C748 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -154,6 +164,7 @@
 			children = (
 				542E410F296FC131000BF8FA /* AppLifeCycle */,
 				542E4110296FC13E000BF8FA /* Resource */,
+				54DF81EA29F16324004E002D /* Common */,
 				5448946929703B79009D948E /* Model */,
 				542E4111296FC158000BF8FA /* View */,
 				546A2A962970194D0033D593 /* ViewModel */,
@@ -287,6 +298,7 @@
 				540B7240296E751D0096C753 /* ListCell.swift in Sources */,
 				C7431F0825F51E1D0094C4CF /* SceneDelegate.swift in Sources */,
 				546A2A9A29701DC40033D593 /* Category.swift in Sources */,
+				54DF81EC29F16333004E002D /* Identifiable.swift in Sources */,
 				546A2A9C29701ECC0033D593 /* Work.swift in Sources */,
 				546A2A9E297034A50033D593 /* MainViewModel.swift in Sources */,
 			);
