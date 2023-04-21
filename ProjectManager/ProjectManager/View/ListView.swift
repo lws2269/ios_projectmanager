@@ -159,7 +159,7 @@ extension ListView: UITableViewDelegate, UITableViewDataSource {
         let navigationViewController = UINavigationController(rootViewController: workFormViewController)
         
         workFormViewController.viewModel =
-        WorkFormViewModel(work:viewModel.workList.value[indexPath.row])
+        WorkFormViewModel(work: viewModel.workList.value[indexPath.row])
         
         workFormViewController.delegate = delegate
         navigationViewController.modalPresentationStyle = UIModalPresentationStyle.formSheet
