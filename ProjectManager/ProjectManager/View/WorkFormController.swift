@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import RxSwift
 
 protocol WorkFormDelegate: AnyObject {
     func send(data: Work)
@@ -13,8 +14,19 @@ protocol WorkFormDelegate: AnyObject {
 
 final class WorkFormViewController: UIViewController {
     var viewModel: WorkFormViewModel?
-    
+    private let disposeBag = DisposeBag()
     weak var delegate: WorkFormDelegate?
+    
+    private let leftBarButton: UIBarButtonItem = {
+        let button = UIBarButtonItem()
+        return button
+    }()
+    
+    private let rightBarButton: UIBarButtonItem = {
+        let button = UIBarButtonItem()
+        button.title = "done"
+        return button
+    }()
     
     private let stackView: UIStackView = {
         let stackView = UIStackView()
@@ -57,47 +69,68 @@ final class WorkFormViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        bodyTextView.delegate = self
         configureNavigationBar()
         configureLayout()
         configureBind()
-        configureData()
-        bodyTextView.delegate = self
     }
     
     private func configureBind() {
-        viewModel?.bindIsEdit { [weak self] in
-            self?.titleTextField.isEnabled = $0
-            self?.bodyTextView.isEditable = $0
-            self?.datePicker.isEnabled = $0
+        if viewModel?.work.value != nil {
+            leftBarButton.title = "edit"
+            
+            leftBarButton.rx.tap
+                .subscribe(onNext: { [weak self] in
+                    self?.viewModel?.isEdit
+                        .accept(!(self?.viewModel?.isEdit.value ?? false))
+                })
+                .disposed(by: disposeBag)
+        } else {
+            leftBarButton.title = "cancel"
+            leftBarButton.rx.tap
+                .subscribe(onNext: { [weak self] in
+                    self?.dismiss(animated: true)
+                })
+                .disposed(by: disposeBag)
         }
         
-        viewModel?.bindTextColor { [weak self] in
-            self?.titleTextField.textColor = $0
-            self?.bodyTextView.textColor = $0
-        }
+        rightBarButton.rx.tap
+            .subscribe(onNext: { [weak self] in
+                self?.viewModel?.updateWork(title: self?.titleTextField.text,
+                                      body: self?.bodyTextView.text,
+                                      date: self?.datePicker.date ?? Date())
+                self?.delegate?.send(data: (self?.viewModel?.work.value)!)
+                self?.dismiss(animated: true)
+            }).disposed(by: disposeBag)
         
-        viewModel?.bindWork { [weak self] work in
-            self?.titleTextField.text = work.title
-            self?.bodyTextView.text = work.body
-            self?.datePicker.date = work.endDate
-        }
-    }
-    
-    private func configureData() {
-        viewModel?.load()
+        viewModel?.isEdit
+            .subscribe(onNext: { [weak self] isEdit in
+                self?.titleTextField.isEnabled = isEdit
+                self?.bodyTextView.isEditable = isEdit
+                self?.datePicker.isEnabled = isEdit
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel?.textColor
+            .subscribe(onNext: { [weak self] color in
+                self?.titleTextField.textColor = color
+                self?.bodyTextView.textColor = color
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel?.work
+            .subscribe(onNext: { [weak self] work in
+                self?.titleTextField.text = work?.title
+                self?.bodyTextView.text = work?.body
+                self?.datePicker.date = work?.endDate ?? Date()
+                self?.viewModel?.isEdit.accept((work == nil) ? true : false)
+            })
+            .disposed(by: disposeBag)
     }
     
     private func configureNavigationBar() {
-        navigationItem.title = "TODO"
-        if viewModel?.work != nil {
-            navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .edit, target: self,
-                                                               action: #selector(editButtonTapped))
-        } else {
-            navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self,
-                                                               action: #selector(cancelButtonTapped))
-        }
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self,
-                                                            action: #selector(doneButtonTapped))
+        navigationItem.leftBarButtonItem = leftBarButton
+        navigationItem.rightBarButtonItem = rightBarButton
         navigationController?.navigationBar.backgroundColor = .systemGray5
     }
     
@@ -116,23 +149,6 @@ final class WorkFormViewController: UIViewController {
             
             titleTextField.heightAnchor.constraint(equalToConstant: 40)
         ])
-    }
-    
-    @objc private func editButtonTapped() {
-        viewModel?.toggleEdit()
-    }
-    
-    @objc private func cancelButtonTapped() {
-        dismiss(animated: true)
-    }
-    
-    @objc private func doneButtonTapped() {
-        guard let work = viewModel?.updateWork(title: titleTextField.text,
-                                              body: bodyTextView.text,
-                                              date: datePicker.date) else { return }
-        
-        delegate?.send(data: work)
-        dismiss(animated: true)
     }
 }
 

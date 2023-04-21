@@ -70,24 +70,26 @@ final class MainViewModel {
     func updateWork(data: Work) {
         switch data.category {
         case .todo:
-            if let index = todoList.firstIndex(of: data) {
-                todoList[index] = data
-            } else {
-                todoList.append(data)
-            }
+            todoList = updateList(list: todoList, data: data)
         case .doing:
-            if let index = doingList.firstIndex(of: data) {
-                doingList[index] = data
-            } else {
-                doingList.append(data)
-            }
+            doingList = updateList(list: doingList, data: data)
         case .done:
-            if let index = doneList.firstIndex(of: data) {
-                doneList[index] = data
-            } else {
-                doneList.append(data)
-            }
+            doneList = updateList(list: doneList, data: data)
         }
+    }
+    
+    func updateList(list: [Work], data: Work) -> [Work] {
+        let prevData = list.filter { $0.id == data.id }
+        var newList = list
+        
+        if !prevData.isEmpty,
+           let index = newList.firstIndex(of: prevData[0]) {
+            newList[index] = data
+        } else {
+            newList.append(data)
+        }
+        
+        return newList
     }
     
     func moveWork(data: Work, category: Category) {
